@@ -1,37 +1,52 @@
-import { getApp } from "firebase/app";
-import axios from "axios";
+import { getAuth, RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth"
 
 class FirebaseAuth {
-	constructor() {}
+  constructor() {
+    this.auth = null
+  }
+  initCaptch(id) {
+    this.recaptchaId = id
+    this.recaptchaVerifier = new RecaptchaVerifier(
+      id,
+      {
+        size: "invisible",
+        callback: response => {
+          console.log(`From CAPTCHA: ${response}`)
+        },
+        "error-callback": () => {
+          console.log(`CAPTCHA ERROR!`)
+          this.recaptchaVerifier._reset()
+        }
+      },
+      this.auth
+    )
+    window.recaptchaVerifier = this.recaptchaVerifier
+  }
+  validateMobile = async phoneNumber => {
+    return new Promise((resolve, reject) => {
+      const appVerifier = window.recaptchaVerifier
 
-	validateMobile = async (phoneNumber, captchaToken) => {
-		return new Promise((resolve, reject) => {
-			axios({
-				method: "post",
-				url: "https://identitytoolkit.googleapis.com/v1/accounts:sendVerificationCode",
-				responseType: "application/json",
-				contentType: "application/json",
-				params: {
-					key: "AIzaSyANZOCs5iQF1kutdk3ekJT11ksw5g1x6uw",
-				},
-				data: {
-					phoneNumber: phoneNumber,
-					recaptchaToken: captchaToken,
-				},
-			})
-				.then((response) => {
-					console.log(JSON.stringify(response));
-					resolve(response);
-				})
-				.catch((error) => {
-					console.log(error.response.data.error);
-					reject(error);
-				});
-		});
-	};
+      signInWithPhoneNumber(this.auth, phoneNumber, appVerifier)
+        .then(confirmationResult => {
+          console.log(`signInWithPhoneNumber: ${confirmationResult}`)
+          // SMS sent. Prompt user to type the code from the message, then sign the
+          // user in with confirmationResult.confirm(code).
+          window.confirmationResult = confirmationResult
 
-	initialize() {}
+          resolve(confirmationResult)
+          // return confirmationResult.confirm(code);
+        })
+        .catch(error => {
+          console.error(`Error: ${error}`)
+          reject(error)
+        })
+    })
+  }
+
+  initialize() {
+    this.auth = getAuth()
+  }
 }
 
-const firebaseAuth = new FirebaseAuth();
-export default firebaseAuth;
+const firebaseAuth = new FirebaseAuth()
+export default firebaseAuth

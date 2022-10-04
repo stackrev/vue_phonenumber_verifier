@@ -6,7 +6,9 @@
     "serve": "vite preview --open",
     "build": "vite build",
     "dev": "vite --open",
-    "preview": "vite build& vite preview --open"
+    "preview": "vite build& vite preview --open",
+    "lint": "eslint --ext .js,.vue --ignore-path .gitignore --fix src",
+    "format": "prettier .  --write"
   },
   "dependencies": {
     "@mdi/font": "5.9.55",
@@ -14,14 +16,21 @@
     "firebase": "^9.10.0",
     "roboto-fontface": "*",
     "vue": "^3.2.37",
-    "vue-recaptcha-v3": "^2.0.1",
+    "vue-tel-input": "^6.0.5",
     "vuetify": "^3.0.0-beta.0",
     "webfontloader": "^1.0.0"
   },
   "devDependencies": {
+    "@babel/core": "^7.19.3",
+    "@babel/eslint-parser": "^7.19.1",
     "@vitejs/plugin-vue": "^3.1.0",
     "eslint": "^8.24.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "eslint-plugin-vue": "^9.6.0",
+    "prettier": "^2.7.1",
     "vite": "^3.1.0",
+    "vite-plugin-eslint": "^1.8.1",
     "vite-plugin-vuetify": "^1.0.0-alpha.12",
     "vue-cli-plugin-vuetify": "~2.5.8",
     "webpack-plugin-vuetify": "^2.0.0-alpha.0"

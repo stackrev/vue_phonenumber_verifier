@@ -1,23 +1,23 @@
 <template>
   <v-app>
     <v-main>
-      <PhoneValidator/>
+      <PhoneValidator />
     </v-main>
   </v-app>
 </template>
 
 <script>
-import PhoneValidator from './components/PhoneValidator.vue'
+import PhoneValidator from "./components/PhoneValidator.vue"
 
 export default {
-  name: 'App',
+  name: "App",
 
   components: {
-    PhoneValidator,
+    PhoneValidator
   },
 
   data: () => ({
     //
-  }),
+  })
 }
 </script>
