@@ -1,15 +1,14 @@
-# Say Hi to your Users with Firebase and Twilio
+# Talk to your Users - with Firebase and Twilio
 
- <!-- title: Say Hi to your Users with Firebase and Twilio -->
+ <!-- title: Talk to your Users - with Firebase and Twilio -->
 
 ![Image: Phone numbers](banner.PNG "Phone numbers")
 
 As product makers, at some point we want to message our users. Luckily firebase SDKs come equiped with that.
-In this article we will create an app that verifys that a user has valid mobile number, and send them a welcome through a messaging service.
+In this article, we will create an app that verifies that a user has a valid mobile number, and send them a welcome SMS through a Twilio's messaging services.
 
-We will build up on the firebase knowledge acquired in our article [VueJS and Capacitor — Portable Mobile Apps made Easy](https://medium.com/call-for-atlas/vuejs-and-capacitor-portable-mobile-apps-made-easy-d14bce8b53a), while making use of the Promises techniques taught in the article [A World of Promises in Javascript and NodeJs](https://medium.com/call-for-atlas/a-world-of-promises-in-javascript-and-nodejs-2b879f907a72).
+We will build up on the firebase knowledge acquired in the article [VueJS and Capacitor — Portable Mobile Apps made Easy](https://medium.com/call-for-atlas/vuejs-and-capacitor-portable-mobile-apps-made-easy-d14bce8b53a), and *Promise* patterns taught in the article [A World of Promises in Javascript and NodeJs](https://medium.com/call-for-atlas/a-world-of-promises-in-javascript-and-nodejs-2b879f907a72).
  
-
 # A Vue App for Mobile Numbers
 
 Since Vue 3 is out, we ought to use the _vue-create_ plugin to scaffold a new project:
@@ -19,17 +18,13 @@ yarn global add @vue/cli
 yarn create vite YOURAPP --template vue
 ```
 
-Follow the prompts on the command line. You should see a test app.
-
-Now add veutify to make our mobile form:
+Follow the prompts on the command line. You should be able to run the standard welcome test app. Now add *Veutify* to give us some WebApp mobile forms:
 
 ```bash
 vue add vuetify
 ```
 
-Follow the prompts again,and select the *Vite* build plugin, to align with what we just installed.
-
-Configure the veutify 3 plugin in _main.js_:
+Follow the prompts again, and select the *Vite* build plugin to align with what we just installed. Configure the *Veutify3* plugin in _main.js_:
 
 ```js
 import { createApp } from "vue"
@@ -42,7 +37,7 @@ loadFonts()
 createApp(App).use(vuetify).mount("#app")
 ```
 
-And configure vite for treeshaking our app in _vite.config.js_:
+And *Vite* for treeshaking our app through the file _vite.config.js_:
 
 ```js
 import vue from "@vitejs/plugin-vue"
@@ -53,12 +48,13 @@ export default {
 }
 ```
 
-With all that, running _yarn dev_ should give you a mock screen to look at.
+With all that done, running _yarn dev_ nd navigating to our browser, should give us the Welcome WebApp again, but with *Vuetify*.
 
 ## The Right Form of Numbers
 
-We want to give a nice experience to our users for inputting their numbers and going throught the verification flow.
-Start by creating a *PhoneValidate.vue* to replace the helloWorld component in the main.js with this:
+We want a nice experience while our users are inputting their numbers and going throught the verification flow. 
+
+Let's craft them a UI. Start by creating a *PhoneValidate.vue* to replace the *helloWorld* component in *main.js* with this:
 ```jsx
 <template>
   <v-form v-if="mobileConfirmation === null" ref="form1" v-model="valid1" lazy-validation>
@@ -112,9 +108,9 @@ export default {
 </script>
 ```
 
-The *vue-tel-input* input plugin fits what the user expects to see for a mobile number input form, though we can it with a simple *text-field*. The input itself guides the user to input the correct format of a number, but we want to make sure it's their number. The phone number format that we should always process is called [E.164](https://en.wikipedia.org/wiki/E.164).
+The *vue-tel-input* input plugin fits what the user expects to see for a mobile number input form. We can also do it with a simple *text-field*. The input itself guides the user to input correctly their number. The phone number format that we should always process is called [E.164](https://en.wikipedia.org/wiki/E.164).
 
-As all vue plugins, these need to be initialized in the *main.js*:
+As with all vue plugins, these need to be initialized in the *main.js*:
 ```js
 ...
 import VueTelInput from "vue-tel-input"
@@ -125,9 +121,9 @@ createApp(App).use(vuetify).use(VueTelInput).mount("#app")
 
 ![Image: Input form](mobileInputForm.PNG "Input form")
 
-## Firebase Phone Authentication Flow.
+## Flow with Firebase Phone Authentication.
 
-Here we will use firebase's phone authentication flow, which involves the SDK and an invisible *captcha*.
+Firebase's has a ready made phone authentication flow, which involves the SDK and an invisible *captcha*.
 
 From the console, we have to enable phone authentication:
 
@@ -175,7 +171,7 @@ const firebase = new Firebase()
 export default firebase
 ```
 
-Finally initiatize it in your *main.js* along every other plugin we will create in this article:
+And initiatize it in your *main.js*, along every other plugin we will create in this article:
 ```js
 import firebase from "@/plugins/firebase"
 ...
@@ -186,7 +182,7 @@ const app = firebase.initialize()
 createApp(App).use(vuetify).use(VueTelInput).mount("#app")
 ```
 
-Create a *firebaseAuth.js* in the plugins folder (and also initialize it in the *main.js*), configure the captcha and the flow:
+Create a *firebaseAuth.js* in the plugins folder (and also initialize it in the *main.js*), configure the captcha and the flow below:
 ```jsx
 import { getAuth, RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth"
 
@@ -224,7 +220,6 @@ class FirebaseAuth {
           window.confirmationResult = confirmationResult
 
           resolve(confirmationResult)
-          // return confirmationResult.confirm(code);
         })
         .catch(error => {
           console.error(`Error: ${error}`)
@@ -242,12 +237,13 @@ const firebaseAuth = new FirebaseAuth()
 export default firebaseAuth
 ```
 
-**RecaptchaVerifier** is the class that will embed the captcha logic, Firebase comes ready out of the box. If this wasn't the case, you would have to use google's captch workspace, create and configure your own - you are interested in how it works (under the hood in this case), have a look at [ReCaptcha](https://www.google.com/recaptcha/about/).
-In our case, we use captcha V2 which we configures with the **size** attribute as invisible. There still might be instances where it will challenge your user with a standard catpcha puzzle, e.g.:
+**RecaptchaVerifier** is the class that will embed the captcha logic which Firebase comes ready out of the box. If this wasn't the case, you would have to use google's captch workspace, create and configure your own - you are interested in how it works (under the hood in this case), have a look at [ReCaptcha](https://www.google.com/recaptcha/about/).
 
-![Image: Captcha Challenge](captchaChallenge.png"Captcha Challenge")
+In our case, we use **ReCaptcha V2**, which we configured with the **size** attribute as invisible not to break the users' experience. Although this is invisible, depending on the usage patterns ReCaptcha might opt to challenge your user with a standard catpcha puzzle, e.g.:
 
-In addition, the captcha has to be anchored to an element, in our case we will configure it through the mount hook in *PhoneValidate.vue* to link itself with our submit button:
+![Image: Captcha Challenge](captchaChallenge.png "Captcha Challenge")
+
+The captcha has to be anchored to an element, in our case we will configure it through the mount hook in *PhoneValidate.vue* to link itself with our **submit button**:
 ```jsx
 ...
 <script>
@@ -274,11 +270,11 @@ export default {
 </script>
 ```
 
-Once that is done, we get the code from the embedded *RecaptchaVerifier* in *firebaseAuth.js*  and pass it to *signInWithPhoneNumber*, from here firebase will do the rest. Firebase we will SMS a verifcation number and we'll need to input it in to complete the flow. This is what you will receive on your mobile:
+Use the code from the embedded *RecaptchaVerifier* in *firebaseAuth.js* to Firebase's *signInWithPhoneNumber* and let it do the rest. Firebase we will SMS a verifcation number and the user will need to use it in to complete the flow. This is what you will receive on your mobile:
 
 ![Image: Verification SMS](verificationSMS.png "Verification SMS")
 
-Adding an additional form to our vue app to take the verification number and display success:
+Add an additional form to allow our user to input the code in our vue WebApp and display success:
 ```jsx
 <v-form v-else ref="form2" v-model="valid2" lazy-validation>
     <v-container class="align-center" justify-center>
@@ -357,7 +353,7 @@ export default {
 </script>
 ```
 
-In this case we have to keep the state of 2 forms and call the service returned from the *signInWithPhoneNumber* promise. Add this to our firebaseAuth.js plugin:
+Call the service returned from the *signInWithPhoneNumber* promise by adding this to our *firebaseAuth.js* plugin:
 ```jsx
 import { getAuth, RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth"
 
@@ -384,19 +380,19 @@ export default firebaseAuth
 ```
 If the returned promise is a success, then we know that this is the user's number and we can communicate with them via SMS.
 
-![Image: Phone OK](phoneOK.PNG"Phone OK")
+![Image: Phone OK](phoneOK.PNG "Phone OK")
 
 # Twilio, Let's Talk
 
-For this article we chose the most common phone platform out there, [Twilio](twilio.com).
+We chose the most common messaging platform out there, [Twilio](twilio.com). You can register a free account with $15 in your subscription. 
 
-You can register a free account with $15 in your subscription. Sending an SMS comes with a tiny cost, buying a number for from them - much more. For our sake, we confirm our own number and send over our line. Twilio has a set of user agreements and setups depending on your country, to keep things simple, test only with your country's number.
+Sending an SMS comes with a tiny cost, buying a number for from them - much more. To keep things light, we confirm our own number and allow Twilio to send messages using that number only. Twilio has a body of user agreements and setups depending on your country, to keep things simple, test only with your country's number.
 
-Once you setup your account, create a messaging service by going through the prompts and keep an note of all the **SIDs** twilio is creating for you, to access your account and to access this service you are creating:
+Once your account is ready, create a messaging service by going through the prompts and keep an note of all the **SIDs** twilio is creating for you:
 
 ![Image: twilio](twilio.PNG "twilio")
 
-Once the serice is ready, test it with a number within your country:
+Test it with a number within your country:
 
 ![Image: Twilio Test](twilioTest.PNG "Twilio Test")
 
@@ -406,20 +402,27 @@ You should receive this SMS:
 
 ## Twilio, Meet Firebase
 
-Firebase has come up with [extensions](https://firebase.google.com/products/extensions?authuser=0&hl=en#explore) that we can use out of the box with minimal setup, though watch out as it will involve GCE and upgrading to a blaze plan (with some minor costs). Find the Twilio extension and set it up with the **SIDs** you should have noted down (or can access again from Twilio's console):
+Firebase has 3rd Party services [extensions](https://firebase.google.com/products/extensions?authuser=0&hl=en#explore) that we can use out of the box with minimal setup. Remember that when using these, you will involve GCE and the **Blaze Plan** (with some minor costs). Find the Twilio extension and set it up with the **SIDs** you should have noted down (or can access again from Twilio's console):
 
 ![Image: Twilio Config](twilioConfig.PNG "Twilio Config")
 
-Twilio will enable a couple of services for you and set up infrastructure, most notable Firebase Store. 
-The extension works by observing the document database **messsages**, any message formatted as below, will be sent as an SMS:
+Twilio will ask for some GCE services (in our case it was the *Secret Manager API*, the *Cloud Pub/Sub API*, and the *Cloud Deployment Manager V2 API*) for you and set up infrastructure, most notable **Cloud Firestore Databse**. 
+
+The extension works by observing the document database **messsages**, any new document formatted like below, will be sent as an SMS:
 
 ![Image: Twilio Firebase](twilioFB.PNG "Twilio Firebase")
 
-The To attribute is were we put in the number, and the body is the message. Try it our, and you should see your body appearing as an SMS, in this case Twilio will decorate the document with success or error metadata:
+The **'To'** attribute is were we put in the number to send to, and the **'body'** is the message we sending. 
 
-![Image: Twilio Firebase Delivery](twilioFBDelivery.PNG"Twilio Firebase Delivery")
+Try it out from your firebase console. 
 
-If you remember from our previous [article](https://medium.com/@adamdarmanin/vuejs-and-capacitor-portable-mobile-apps-made-easy-d14bce8b53a), firebase data stores need to be carefully configured to limit access. Firestore is the same, this is the configuration we will be using through out our article:
+You should see your body appearing as an SMS, in this case Twilio will decorate the document in the database with success or error metadata:
+
+![Image: Twilio Firebase Delivery](twilioFBDelivery.PNG "Twilio Firebase Delivery")
+
+If you remember from our previous [article](https://medium.com/@adamdarmanin/vuejs-and-capacitor-portable-mobile-apps-made-easy-d14bce8b53a), firebase databases need to be carefully configured to limit access. Firestore is the same.
+
+This is the configuration we are using throughout our article:
 ```js
 rules_version = '2';
 service cloud.firestore {
@@ -434,7 +437,7 @@ We want only authenticated users which had their mobile number verified, before 
 
 ## The Final App
 
-Finally, we will interact with Twilio through our App. Create a firestore plugin:
+Time to combine everything we did. Create a firestore plugin:
 ```js
 import { getFirestore, collection, addDoc } from "firebase/firestore/lite"
 
@@ -477,11 +480,11 @@ Call the *sendWelcomeMessage* when the promise from *confirmMobileWithCode* is a
 
 With all that done, you ought to recieve a friendly SMS:
 
-![Image: Final Message](finalMsg.png"Final Message")
+![Image: Final Message](finalMsg.png "Final Message")
 
 # Conclusion
 
-In this article, we combined the power of Firebase and Twilio to send messages to our users with little mmonetary cost, and even less effort.
+In this article, we combined the power of Firebase and Twilio to send messages to our users with little monetary cost, and even less effort.
 
 This article is part of a series of app related articles working with Firebase.
 
