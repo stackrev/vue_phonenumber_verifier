@@ -22,7 +22,7 @@ class FirebaseAuth {
     )
     window.recaptchaVerifier = this.recaptchaVerifier
   }
-  validateMobile = async phoneNumber => {
+  initValidateMobile = async phoneNumber => {
     return new Promise((resolve, reject) => {
       const appVerifier = window.recaptchaVerifier
 
@@ -42,9 +42,23 @@ class FirebaseAuth {
         })
     })
   }
+  confirmMobileWithCode = async (confirmationResult, code) => {
+    return new Promise((resolve, reject) => {
+      confirmationResult
+        .confirm(code)
+        .then(result => {
+          console.log(`confirm: ${result.user}`)
+          resolve()
+        })
+        .catch(error => {
+          console.error(`Error confirm: ${error}`)
+          reject(error)
+        })
+    })
+  }
 
-  initialize() {
-    this.auth = getAuth()
+  initialize(app) {
+    this.auth = getAuth(app)
   }
 }
 

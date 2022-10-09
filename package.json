@@ -1,12 +1,11 @@
 {
   "name": "org.adamd",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
-    "serve": "vite preview --open",
     "build": "vite build",
     "dev": "vite --open",
-    "preview": "vite build& vite preview --open",
+    "serve": "vite build& vite preview --open",
     "lint": "eslint --ext .js,.vue --ignore-path .gitignore --fix src",
     "format": "prettier .  --write"
   },

@@ -5,10 +5,12 @@ import vuetify from "@/plugins/vuetify"
 import { loadFonts } from "@/plugins/webfontloader"
 import firebase from "@/plugins/firebase"
 import firebaseAuth from "@/plugins/firebaseAuth"
+import firebaseStore from "@/plugins/firebaseStore"
 import VueTelInput from "vue-tel-input"
 
-firebase.initialize()
-firebaseAuth.initialize()
+const app = firebase.initialize()
+firebaseAuth.initialize(app)
+firebaseStore.initialize(app)
 
 loadFonts()
 
